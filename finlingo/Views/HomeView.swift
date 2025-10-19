@@ -1,52 +1,71 @@
 import SwiftUI
 
-struct HomeView: View {
-    @State private var animatedText = ""
-    private let fullText = "Welcome back, Neel!"
-    private let typingSpeed = 0.1  // seconds per character
-
+// Placeholder for Earth's outer view.
+// NOTE: You should replace this with your actual view in its own file.
+struct EarthOuterView: View {
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .topLeading) {
-                // Background image and effects
-                Image("simple_night_sky")
-                    .resizable()
-                    .scaledToFill()
-                    .brightness(-0.12)
-                    .contrast(1.18)
-                    .overlay(Rectangle().fill(Color.orange.opacity(0.12)).blendMode(.color))
-                    .overlay(Rectangle().fill(Color.white.opacity(0.12)).blendMode(.screen))
-                    .overlay(Rectangle().fill(Color.black.opacity(0.08)).blendMode(.multiply))
-                    .brightness(0.02)
-                    .ignoresSafeArea()
-
-                // Typewriter text
-                Text(animatedText)
-                    .font(.custom("StarlightRune", size: 50))
-                    .foregroundColor(Color(red: 1.0, green: 0.905, blue: 0.619))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                    .padding(.leading, 35)
-                    .padding(.top, 50)
-                    .shadow(color: Color.black.opacity(0.5), radius: 2, x: 0, y: 1)
-                    .onAppear {
-                        animateText()
-                    }
-            }
-            .toolbar(.hidden, for: .navigationBar)
-        }
-    }
-
-    private func animateText() {
-        animatedText = ""
-        for (index, char) in fullText.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * typingSpeed) {
-                animatedText.append(char)
+        ZStack {
+            Image("simple_night_sky")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            VStack {
+                Text("Earth")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                Text("Our Home Planet")
+                    .font(.headline)
+                    .foregroundColor(.blue)
             }
         }
     }
 }
 
-#Preview {
-    HomeView()
+// Placeholder for Pluto's outer view.
+// NOTE: You should replace this with your actual view in its own file.
+struct PlutoOuterView: View {
+    var body: some View {
+        ZStack {
+            Image("simple_night_sky")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            VStack {
+                Text("Pluto")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                Text("The Distant Dwarf Planet")
+                    .font(.headline)
+                    .foregroundColor(.cyan)
+            }
+        }
+    }
+}
+
+// The main HomeView which allows swiping between planets.
+struct HomeView: View {
+    @State private var selection: Int = 0
+
+    var body: some View {
+        // A TabView with a page style allows for a swipe-through interface.
+        TabView(selection: $selection) {
+            MercuryOuterView()
+                .tag(0)
+            EarthOuterView()
+                .tag(1)
+            PlutoOuterView()
+                .tag(2)
+        }
+        .tabViewStyle(.page(indexDisplayMode: .automatic))
+        .id(selection) // Forces teardown/recreation on page change to reduce retained memory
+        .ignoresSafeArea() // Ensures the view extends to the screen edges
+    }
+}
+
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+    }
 }

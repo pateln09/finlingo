@@ -15,7 +15,8 @@ struct ShootingStarView: View {
     }
     
     @State private var stars: [ShootingStar] = []
-    @State private var timer: Timer? = nil
+    @State private var isRunning = false
+    @State private var tick: Int = 0
     
     func generateShootingStar(in geometry: GeometryProxy) {
         let size: CGFloat = CGFloat.random(in: 10...20)  // Larger stars for better visibility
@@ -39,66 +40,76 @@ struct ShootingStarView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                Color.clear.ignoresSafeArea()
-                
-                // Create the shooting stars with a more noticeable light trail
-                ForEach(stars.indices, id: \.self) { index in
-                    let star = stars[index]
+            TimelineView(.animation) { timeline in
+                ZStack {
+                    Color.clear.ignoresSafeArea()
                     
-                    Image(systemName: "star.fill")
-                        .resizable()
-                        .frame(width: star.size, height: star.size)
-                        .position(star.position)
-                        .rotationEffect(.degrees(Double(star.angle)))
-                        .offset(x: star.position.x, y: star.position.y)
-                        .foregroundColor(Color(red: 1.0, green: 0.905, blue: 0.619))  // Set star color here
-                        .animation(.linear(duration: star.duration).repeatForever(autoreverses: false), value: star.position)
-                        .onAppear {
-                            let newPosition = CGPoint(x: star.position.x + CGFloat(cos(star.angle) * 500), y: star.position.y + CGFloat(sin(star.angle) * 500))
-                            
-                            withAnimation {
-                                stars[index].position = newPosition
-                            }
-                        }
-                    
-                    // More noticeable light trail (larger and brighter fading dots)
-                    ForEach(star.trail.indices, id: \.self) { trailIndex in
-                        let trailPoint = star.trail[trailIndex]
+                    ForEach(stars.indices, id: \.self) { index in
+                        let star = stars[index]
                         
-                        Circle()
-                            .fill(Color.white.opacity(0.7))  // Higher opacity for better visibility
-                            .frame(width: star.size / 2.5, height: star.size / 2.5)  // Larger trail dots
-                            .position(trailPoint)
-                            .animation(.easeOut(duration: 1.0).delay(Double(trailIndex) * 0.1), value: trailPoint)
+                        // Main shooting star (icon)
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .frame(width: star.size, height: star.size)
+                            .position(star.position)
+                            .rotationEffect(.degrees(Double(star.angle)))
+                            .foregroundColor(Color(red: 1.0, green: 0.905, blue: 0.619))  // Star color
+                        
+                        // Light trail (small dots following the shooting star)
+                        ForEach(star.trail.indices, id: \.self) { trailIndex in
+                            let trailPoint = star.trail[trailIndex]
+                            
+                            Circle()
+                                .fill(Color.white.opacity(0.7))  // Higher opacity for better visibility
+                                .frame(width: star.size / 2.5, height: star.size / 2.5)  // Larger trail dots
+                                .position(trailPoint)
+                        }
                     }
                 }
-                
-            }
-            .onAppear {
-                timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-                    generateShootingStar(in: geometry)
+                .onAppear {
+                    isRunning = true
                 }
-            }
-            .onDisappear {
-                timer?.invalidate()
-            }
-            .onChange(of: stars) { _ in
-                // Update the trail for each star
-                for index in stars.indices {
-                    var updatedStar = stars[index]
-                    // Add new trail point near the shooting star's position
-                    updatedStar.trail.append(updatedStar.position)
+                .onDisappear {
+                    isRunning = false
+                }
+                .onChange(of: timeline.date) { _ in
+                    guard isRunning else { return }
                     
-                    // Limit the number of trail points to avoid excess
-                    if updatedStar.trail.count > 20 {  // Increased trail length
-                        updatedStar.trail.removeFirst()
+                    tick += 1
+                    
+                    // Occasionally generate a new shooting star (every ~10 ticks, about 1 second)
+                    if tick % 10 == 0 {
+                        generateShootingStar(in: geometry)
                     }
                     
-                    stars[index] = updatedStar
+                    // Update stars positions and trails
+                    for index in stars.indices {
+                        var star = stars[index]
+                        
+                        // Move star position based on angle and speed (distance per tick)
+                        // Calculate distance per tick to match duration roughly
+                        let totalDistance: CGFloat = 500
+                        let steps = star.duration / 0.1
+                        let distancePerTick = totalDistance / CGFloat(steps)
+                        
+                        let newX = star.position.x + CGFloat(cos(star.angle)) * distancePerTick
+                        let newY = star.position.y + CGFloat(sin(star.angle)) * distancePerTick
+                        
+                        let newPosition = CGPoint(x: newX, y: newY)
+                        star.position = newPosition
+                        
+                        // Append new trail point
+                        star.trail.append(newPosition)
+                        
+                        // Limit trail length
+                        if star.trail.count > 20 {
+                            star.trail.removeFirst()
+                        }
+                        
+                        stars[index] = star
+                    }
                 }
             }
         }
     }
 }
-

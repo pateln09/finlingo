@@ -143,7 +143,7 @@ struct MercuryOuterView: View {
                     .padding(.top, -100)
                     .shadow(color: .black.opacity(0.6), radius: 4, x: 0, y: 2)
                     .multilineTextAlignment(.center)
-                    .onAppear { typewrite() }
+                    .task(id: showDetailView) { await runTypewriter() }
 
                 if !showDetailView {
                     // Mercury image with progress bar overlaid just below it.
@@ -154,7 +154,7 @@ struct MercuryOuterView: View {
                         .offset(y: float ? -10 : 10)
                         .shadow(color: .black.opacity(0.4), radius: 25, x: 0, y: 12)
                         .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: float)
-                        .onAppear { float = true }
+                        .task { float = true }
                         .onTapGesture {
                             withAnimation(.spring(response: 0.55, dampingFraction: 0.88)) {
                                 showDetailView = true
@@ -237,12 +237,12 @@ struct MercuryOuterView: View {
 
     // MARK: - Animations and Helpers
 
-    private func typewrite() {
+    private func runTypewriter() async {
         animatedText = ""
-        for (i, ch) in fullText.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * typingSpeed) {
-                animatedText.append(ch)
-            }
+        for ch in fullText {
+            if Task.isCancelled { return }
+            animatedText.append(ch)
+            try? await Task.sleep(for: .milliseconds(Int(typingSpeed * 1000)))
         }
     }
 

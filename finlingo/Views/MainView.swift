@@ -7,7 +7,7 @@ struct MainView: View {
     var body: some View {
         TabView {
             // Home View
-            MercuryOuterView()
+            HomeView()
                 .tabItem {
                     Image(systemName: "house.fill")
 //                    Text("Home")

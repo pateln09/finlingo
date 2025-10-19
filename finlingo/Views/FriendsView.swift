@@ -40,7 +40,14 @@ struct FriendsView: View {
                         .padding(.leading, 55)
                         .padding(.top, 50)
                         .shadow(color: Color.black.opacity(0.5), radius: 2, x: 0, y: 1)
-                        .onAppear { animateText() }
+                        .task {
+                            animatedText = ""
+                            for char in fullText {
+                                if Task.isCancelled { break }
+                                animatedText.append(char)
+                                try? await Task.sleep(for: .milliseconds(Int(typingSpeed * 1000)))
+                            }
+                        }
 
                     // Friends list
                     VStack(spacing: 14) {
@@ -90,17 +97,8 @@ struct FriendsView: View {
         let last = parts.dropFirst().first?.first.map(String.init) ?? ""
         return (first + last).uppercased()
     }
-
-    private func animateText() {
-        animatedText = ""
-        for (index, char) in fullText.enumerated() {
-            DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * typingSpeed) {
-                animatedText.append(char)
-            }
-        }
-    }
 }
-
+ 
 #Preview {
     FriendsView()
 }

@@ -54,30 +54,20 @@ struct SplashView: View {
         }
         // Drives the opacity transition of the Main layer
         .animation(.easeInOut(duration: crossFadeDuration), value: showMainView)
-        .onAppear { runSequence() }
-    }
-
-    private func runSequence() {
-        // 1) Typewriter
-        animatedText = ""
-        let totalTypingTime = typingStartDelay + Double(fullText.count) * typingSpeed
-        DispatchQueue.main.asyncAfter(deadline: .now() + typingStartDelay) {
-            for (i, ch) in fullText.enumerated() {
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * typingSpeed) {
-                    animatedText.append(ch)
-                }
+        .task {
+            animatedText = ""
+            try? await Task.sleep(for: .milliseconds(Int(typingStartDelay * 1000)))
+            for ch in fullText {
+                guard !Task.isCancelled else { return }
+                animatedText.append(ch)
+                try? await Task.sleep(for: .milliseconds(Int(typingSpeed * 1000)))
             }
-        }
-
-        // 2) Zoom + cross dissolve trigger
-        DispatchQueue.main.asyncAfter(deadline: .now() + totalTypingTime + postTypingPause) {
+            try? await Task.sleep(for: .milliseconds(Int(postTypingPause * 1000)))
             withAnimation(.easeIn(duration: 1.3)) {
                 animate = true
             }
-            // Flip the flag to *create* MainView (and thus HomeView) slightly before zoom ends
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
-                showMainView = true
-            }
+            try? await Task.sleep(for: .milliseconds(900))
+            showMainView = true
         }
     }
 }
