@@ -9,13 +9,36 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Image("splashscreen_background") // background image in Assets.xcassets
+            Image("splashscreen_background")
                 .resizable()
                 .scaledToFill()
+                // Exposure down slightly
+                .brightness(-0.12)
+                // Increase contrast
+                .contrast(1.18)
+                // Slightly warmer overall color temperature approximation
+                .overlay(
+                    Rectangle()
+                        .fill(Color.orange.opacity(0.12))
+                        .blendMode(.color)
+                )
+                // Boost highlights noticeably
+                .overlay(
+                    Rectangle()
+                        .fill(Color.white.opacity(0.12))
+                        .blendMode(.screen)
+                )
+                .overlay(
+                    Rectangle()
+                        .fill(Color.black.opacity(0.08))
+                        .blendMode(.multiply)
+                )
+                // Lift shadows slightly (net effect after contrast)
+                .brightness(0.02)
                 .ignoresSafeArea()
 
             if !showMainView {
-                Text("finlingo")
+                Text("Finlingo")
                     .font(.custom("StarlightRune", size: 130))
                     .foregroundColor(Color(red: 1.0, green: 0.905, blue: 0.619))
                     .scaleEffect(animate ? 25 : 1, anchor: anchor)
@@ -33,9 +56,15 @@ struct SplashView: View {
                         }
                     }
             } else {
-                ContentView() // next screen (placeholder)
+                MainView() // next screen (placeholder)
                     .transition(.opacity)
             }
         }
     }
 }
+//struct myView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        SplashView()
+//    }
+//}
+
