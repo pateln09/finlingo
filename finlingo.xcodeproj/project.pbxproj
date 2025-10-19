@@ -7,12 +7,25 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		07F6FE182EA467230084A9DE /* finlingo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = finlingo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		07F6FE322EA468FD0084A9DE /* finlingo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = finlingo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		07F6FE342EA469150084A9DE /* Exceptions for "finlingo" folder in "finlingo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 07F6FE172EA467230084A9DE /* finlingo */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		07F6FE1A2EA467230084A9DE /* finlingo */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				07F6FE342EA469150084A9DE /* Exceptions for "finlingo" folder in "finlingo" target */,
+			);
 			path = finlingo;
 			sourceTree = "<group>";
 		};
@@ -33,16 +46,8 @@
 			isa = PBXGroup;
 			children = (
 				07F6FE1A2EA467230084A9DE /* finlingo */,
-				07F6FE192EA467230084A9DE /* Products */,
+				07F6FE322EA468FD0084A9DE /* finlingo.app */,
 			);
-			sourceTree = "<group>";
-		};
-		07F6FE192EA467230084A9DE /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				07F6FE182EA467230084A9DE /* finlingo.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -67,7 +72,7 @@
 			packageProductDependencies = (
 			);
 			productName = finlingo;
-			productReference = 07F6FE182EA467230084A9DE /* finlingo.app */;
+			productReference = 07F6FE322EA468FD0084A9DE /* finlingo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -95,7 +100,7 @@
 			mainGroup = 07F6FE0F2EA467230084A9DE;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 07F6FE192EA467230084A9DE /* Products */;
+			productRefGroup = 07F6FE0F2EA467230084A9DE;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -256,6 +261,7 @@
 				DEVELOPMENT_TEAM = 2DS6UXWTLZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = finlingo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -288,6 +294,7 @@
 				DEVELOPMENT_TEAM = 2DS6UXWTLZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = finlingo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
