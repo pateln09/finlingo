@@ -6,24 +6,24 @@ struct MainView: View {
 
     var body: some View {
         TabView {
-            // Home tab with glass navigation bar
-            HomeView()
+            // Home View
+            MercuryOuterView()
                 .tabItem {
                     Image(systemName: "house.fill")
 //                    Text("Home")
                 }
 
             // Resources tab
-            ResourcesTab()
+            FriendsView()
                 .tabItem {
                     Image(systemName: "person.2.fill")
 //                    Text("Friends")
                 }
 
-            // Book tab
-            BookTab()
+            // Resources View
+            SettingsView()
                 .tabItem {
-                    Image(systemName: "book.fill")
+                    Image(systemName: "gearshape.fill")
 //                    Text("Resources")
                 }
         }
@@ -37,29 +37,6 @@ struct MainView: View {
     }
 }
 
-// MARK: - Inline subviews used only by MainView
-
-private struct ResourcesTab: View {
-    var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
-            Text("Resources View")
-                .font(.largeTitle)
-                .foregroundColor(.gray)
-        }
-    }
-}
-
-private struct BookTab: View {
-    var body: some View {
-        ZStack {
-            Color.white.ignoresSafeArea()
-            Text("Book View")
-                .font(.largeTitle)
-                .foregroundColor(.gray)
-        }
-    }
-}
 
 #Preview {
     MainView()
