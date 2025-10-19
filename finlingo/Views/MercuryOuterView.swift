@@ -1,5 +1,97 @@
 import SwiftUI
 
+// Minimal progress bar: gold fill, % number at side (StarlightRune), no background box.
+struct PlanetProgressBar: View {
+    var progress: Double   // 0.0 ... 1.0
+
+    private let barHeight: CGFloat = 18
+    private let corner: CGFloat = 10
+    private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
+
+    var body: some View {
+        HStack(spacing: 10) {
+            GeometryReader { geo in
+                let width = geo.size.width
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(Color.white.opacity(0.10))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: corner, style: .continuous)
+                                .stroke(.white.opacity(0.15), lineWidth: 1)
+                        )
+
+                    RoundedRectangle(cornerRadius: corner, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [gold.opacity(0.9), gold]),
+                                startPoint: .leading, endPoint: .trailing
+                            )
+                        )
+                        .frame(width: width * max(0, min(1, progress)))
+                        .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 1)
+                }
+            }
+            .frame(height: barHeight)
+
+            Text("\(Int(progress * 100))%")
+                .font(.custom("StarlightRune", size: 30))
+                .foregroundColor(gold)
+                .accessibilityLabel("Progress \(Int(progress * 100)) percent")
+        }
+        .frame(height: barHeight)
+        .frame(width: 275)
+    }
+}
+
+// Top-right money badge: your image on the LEFT, number on the RIGHT.
+struct MoneyBadge: View {
+    var imageName: String = "stardust"    // <- replace with your asset name, if needed
+    var amount: Int
+
+    private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(imageName)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+
+            Text("\(amount)")
+                .font(.custom("StarlightRune", size: 40))
+                .foregroundColor(gold)
+                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                .accessibilityLabel("Money \(amount)")
+        }
+    }
+}
+
+// Top-left streak badge: now using filled gold flame icon.
+struct StreakBadge: View {
+    var count: Int
+
+    private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
+
+    var body: some View {
+        HStack(spacing: 8) {
+            // Filled gold flame icon to match theme
+            Image(systemName: "flame.fill")
+                .renderingMode(.template)
+                .foregroundColor(gold)
+//                .frame(width: 48, height: 48)
+                .font(.system(size: 30, weight: .regular))
+                .shadow(color: gold.opacity(0.4), radius: 6)  // soft glow
+                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 1)
+
+            Text("\(count)")
+                .font(.custom("StarlightRune", size: 34))
+                .foregroundColor(gold)
+                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                .accessibilityLabel("Streak \(count) days")
+        }
+    }
+}
+
 struct MercuryOuterView: View {
     // Typewriter
     @State private var animatedText = ""
@@ -14,6 +106,18 @@ struct MercuryOuterView: View {
 
     // Styling
     private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
+
+    // Backends (separate files)
+    @StateObject private var progressStore = ProgressStore.shared
+    @StateObject private var moneyStore = MoneyStore.shared
+    @StateObject private var streakStore = StreakStore.shared
+
+    private let planetID = "mercury"
+
+    // Debug knobs for quick testing
+    @State private var debugCompletion: Double = 0.32
+    @State private var debugMoneyStart: Int = 1231
+    @State private var debugStreakStart: Int = 13   // Initial streak value set to 13
 
     var body: some View {
         ZStack {
@@ -30,7 +134,7 @@ struct MercuryOuterView: View {
                 .ignoresSafeArea()
 
             // Outer content
-            VStack(spacing: 50) {
+            VStack(spacing: 20) {
                 Spacer()
 
                 Text(animatedText)
@@ -42,13 +146,14 @@ struct MercuryOuterView: View {
                     .onAppear { typewrite() }
 
                 if !showDetailView {
+                    // Mercury image with progress bar overlaid just below it.
                     Image("mercury_planet")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
                         .offset(y: float ? -10 : 10)
                         .shadow(color: .black.opacity(0.4), radius: 25, x: 0, y: 12)
-                        .animation(.easeInOut(duration: 1.69).repeatForever(autoreverses: true), value: float)
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: float)
                         .onAppear { float = true }
                         .onTapGesture {
                             withAnimation(.spring(response: 0.55, dampingFraction: 0.88)) {
@@ -56,11 +161,33 @@ struct MercuryOuterView: View {
                             }
                         }
                         .accessibilityLabel("Open Mercury details")
+                        .overlay(
+                            PlanetProgressBar(progress: progressStore.progress(for: planetID))
+                                .offset(y: 36),
+                            alignment: .bottom
+                        )
+                    
                 }
 
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            // 🔝 Top-right money overlay
+            .overlay(
+                MoneyBadge(imageName: "stardust", amount: moneyStore.balance)
+                    .padding(.top, 40)
+                    .padding(.trailing, 50),
+                alignment: .topTrailing
+            )
+
+            // 🔝 Top-left streak overlay — filled flame & shifted right
+            .overlay(
+                StreakBadge(count: streakStore.currentStreak)
+                    .padding(.top, 40)
+                    .padding(.leading, 62),
+                alignment: .topLeading
+            )
 
             // Inner overlay (NO planet here)
             if showDetailView {
@@ -72,7 +199,7 @@ struct MercuryOuterView: View {
                     .zIndex(1)
             }
 
-            // Always-on-top close button when inner is shown
+            // Close button
             if showDetailView {
                 Button {
                     withAnimation(.spring(response: 0.55, dampingFraction: 0.9)) {
@@ -84,20 +211,31 @@ struct MercuryOuterView: View {
                         .foregroundColor(.white.opacity(0.9))
                         .shadow(color: .black.opacity(0.5), radius: 6, x: 0, y: 2)
                         .padding(.all, 18)
-                        .background(Color.black.opacity(0.001)) // keeps tap area generous
+                        .background(Color.black.opacity(0.001))
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 10)
-                .padding(.trailing, 12)
+                .padding(.top, 50)
+                .padding(.trailing, 20)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                .zIndex(2) // make sure it’s above everything
+                .zIndex(2)
                 .allowsHitTesting(true)
                 .accessibilityLabel("Close")
             }
         }
+        .onAppear {
+            // Seed debug values — adjust/remove once real logic is connected
+            progressStore.setProgress(debugCompletion, for: planetID)
+            moneyStore.setBalance(debugMoneyStart)
+
+            // Initialize the streak (for demo) and mark today active.
+            streakStore.setDebugStreak(debugStreakStart)
+            streakStore.markTodayActive()
+        }
         .toolbar(.hidden, for: .navigationBar)
     }
+
+    // MARK: - Animations and Helpers
 
     private func typewrite() {
         animatedText = ""
@@ -106,6 +244,19 @@ struct MercuryOuterView: View {
                 animatedText.append(ch)
             }
         }
+    }
+
+    // Example usage hooks if you want to trigger updates from elsewhere:
+    private func markLessonComplete() {
+        progressStore.addProgress(10, for: planetID)
+    }
+
+    private func awardCoins(_ amount: Int) {
+        _ = moneyStore.add(amount)
+    }
+
+    private func markStreakToday() {
+        streakStore.markTodayActive()
     }
 }
 

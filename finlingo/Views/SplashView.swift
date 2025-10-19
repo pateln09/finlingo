@@ -33,7 +33,7 @@ struct SplashView: View {
                 .brightness(0.02)
                 .ignoresSafeArea()
             
-            ShootingStarsView()
+            ShootingStarView()
 
             // Splash layer
             Text(animatedText)
