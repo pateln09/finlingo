@@ -1,49 +1,5 @@
 import SwiftUI
 
-// Placeholder for Earth's outer view.
-// NOTE: You should replace this with your actual view in its own file.
-struct EarthOuterView: View {
-    var body: some View {
-        ZStack {
-            Image("simple_night_sky")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            VStack {
-                Text("Earth")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                Text("Our Home Planet")
-                    .font(.headline)
-                    .foregroundColor(.blue)
-            }
-        }
-    }
-}
-
-// Placeholder for Pluto's outer view.
-// NOTE: You should replace this with your actual view in its own file.
-struct PlutoOuterView: View {
-    var body: some View {
-        ZStack {
-            Image("simple_night_sky")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            VStack {
-                Text("Pluto")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                Text("The Distant Dwarf Planet")
-                    .font(.headline)
-                    .foregroundColor(.cyan)
-            }
-        }
-    }
-}
-
 // The main HomeView which allows swiping between planets.
 struct HomeView: View {
     @State private var selection: Int = 0

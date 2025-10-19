@@ -1,7 +1,15 @@
+//
+//  PlanetProgressBar.swift
+//  finlingo
+//
+//  Created by Neel Patel on 10/19/25.
+//
+
+
 import SwiftUI
 
 // Minimal progress bar: gold fill, % number at side (StarlightRune), no background box.
-struct PlanetProgressBar: View {
+struct PlanetProgressBar1: View {
     var progress: Double   // 0.0 ... 1.0
 
     private let barHeight: CGFloat = 18
@@ -43,59 +51,10 @@ struct PlanetProgressBar: View {
     }
 }
 
-// Top-right money badge: your image on the LEFT, number on the RIGHT.
-struct MoneyBadge: View {
-    var imageName: String = "stardust"    // <- replace with your asset name, if needed
-    var amount: Int
-
-    private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
-
-    var body: some View {
-        HStack(spacing: 8) {
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 48, height: 48)
-
-            Text("\(amount)")
-                .font(.custom("StarlightRune", size: 40))
-                .foregroundColor(gold)
-                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
-                .accessibilityLabel("Money \(amount)")
-        }
-    }
-}
-
-// Top-left streak badge: now using filled gold flame icon.
-struct StreakBadge: View {
-    var count: Int
-
-    private let gold = Color(red: 1.0, green: 0.905, blue: 0.619)
-
-    var body: some View {
-        HStack(spacing: 8) {
-            // Filled gold flame icon to match theme
-            Image(systemName: "flame.fill")
-                .renderingMode(.template)
-                .foregroundColor(gold)
-//                .frame(width: 48, height: 48)
-                .font(.system(size: 30, weight: .regular))
-                .shadow(color: gold.opacity(0.4), radius: 6)  // soft glow
-                .shadow(color: .black.opacity(0.35), radius: 2, x: 0, y: 1)
-
-            Text("\(count)")
-                .font(.custom("StarlightRune", size: 34))
-                .foregroundColor(gold)
-                .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
-                .accessibilityLabel("Streak \(count) days")
-        }
-    }
-}
-
-struct MercuryOuterView: View {
+struct EarthOuterView: View {
     // Typewriter
     @State private var animatedText = ""
-    private let fullText = "Mercury"
+    private let fullText = "Earth"
     private let typingSpeed = 0.1
 
     // Floating animation
@@ -112,10 +71,10 @@ struct MercuryOuterView: View {
     @StateObject private var moneyStore = MoneyStore.shared
     @StateObject private var streakStore = StreakStore.shared
 
-    private let planetID = "mercury"
+    private let planetID = "Earth"
 
     // Debug knobs for quick testing
-    @State private var debugCompletion: Double = 0.32
+    @State private var debugCompletion: Double = 0.21
     @State private var debugMoneyStart: Int = 1231
     @State private var debugStreakStart: Int = 13   // Initial streak value set to 13
 
@@ -147,7 +106,7 @@ struct MercuryOuterView: View {
 
                 if !showDetailView {
                     // Mercury image with progress bar overlaid just below it.
-                    Image("mercury_planet")
+                    Image("earth_planet")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 300, height: 300)
@@ -160,9 +119,9 @@ struct MercuryOuterView: View {
                                 showDetailView = true
                             }
                         }
-                        .accessibilityLabel("Open Mercury details")
+                        .accessibilityLabel("Open Earth details")
                         .overlay(
-                            PlanetProgressBar(progress: progressStore.progress(for: planetID))
+                            PlanetProgressBar1(progress: progressStore.progress(for: planetID))
                                 .offset(y: 36),
                             alignment: .bottom
                         )
@@ -191,7 +150,7 @@ struct MercuryOuterView: View {
 
             // Inner overlay (NO planet here)
             if showDetailView {
-                MercuryInnerView(showDetailView: $showDetailView)
+                EarthInnerView(showDetailView: $showDetailView)
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .scale(scale: 0.98)),
                         removal: .opacity
@@ -260,4 +219,4 @@ struct MercuryOuterView: View {
     }
 }
 
-#Preview { MercuryOuterView() }
+//#Preview { MercurOuterView() }
